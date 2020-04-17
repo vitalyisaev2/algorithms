@@ -1,17 +1,13 @@
 package arrays
 
-import (
-	"fmt"
-)
+type isUniqueBytes func([]byte) bool
 
-type isUniqueString func(string) bool
-
-func isUniqueStringWithBoolArray(input string) bool {
-	if len(input) > 256 {
+func IsUniqueBytesWithBoolArray(input []byte) bool {
+	if len(input) > 128 {
 		return false
 	}
 
-	visited := make([]bool, 256)
+	visited := make([]bool, 128)
 
 	for _, char := range input {
 		if visited[int(char)] {
@@ -24,18 +20,17 @@ func isUniqueStringWithBoolArray(input string) bool {
 	return true
 }
 
-func isUniqueStringWithBitArray(input string) bool {
-	if len(input) > 256 {
+func IsUniqueBytesWithBitArray(input []byte) bool {
+	if len(input) > 128 {
 		return false
 	}
 
-	bitset := [4]int64{0, 0, 0, 0}
+	bitset := [2]int64{0, 0}
 
-	fmt.Println(input)
 	for _, char := range input {
 		bitsetItem := int(char) / 64
 		bitsetOffset := int(char) % 64
-		fmt.Println(bitsetItem, bitsetOffset)
+
 		if (bitset[bitsetItem] & (1 << bitsetOffset)) > 0 {
 			return false
 		}

@@ -10,7 +10,7 @@ import (
 )
 
 type isUniqueStringTestCase struct {
-	input  string
+	input  []byte
 	output bool
 }
 
@@ -18,7 +18,7 @@ func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 	// конструирование наиболее длинной уникальной строки из возможных
 	buf := strings.Builder{}
 
-	for i := int(0); i < 256; i++ {
+	for i := int(0); i < 128; i++ {
 		_ = buf.WriteByte(byte(i))
 	}
 
@@ -26,27 +26,27 @@ func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 
 	return []isUniqueStringTestCase{
 		{
-			input:  "a",
+			input:  []byte("a"),
 			output: true,
 		},
 		{
-			input:  "aa",
+			input:  []byte("aa"),
 			output: false,
 		},
 		{
-			input:  "ab",
+			input:  []byte("ab"),
 			output: true,
 		},
 		{
-			input:  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			input:  []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
 			output: true,
 		},
 		{
-			input:  utils.RandomString(257),
+			input:  utils.RandomBytes(129),
 			output: false,
 		},
 		{
-			input:  longestUniqueLine,
+			input:  []byte(longestUniqueLine),
 			output: true,
 		},
 	}
@@ -55,9 +55,9 @@ func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 func TestIsUniqueString(t *testing.T) {
 	testCases := makeIsUniqueStringTestCases()
 
-	callbacks := []isUniqueString{
-		isUniqueStringWithBitArray,
-		isUniqueStringWithBoolArray,
+	callbacks := []isUniqueBytes{
+		IsUniqueBytesWithBitArray,
+		IsUniqueBytesWithBoolArray,
 	}
 
 	for _, cb := range callbacks {
@@ -72,17 +72,20 @@ func TestIsUniqueString(t *testing.T) {
 func BenchmarkIsUniqueString(b *testing.B) {
 	testCases := makeIsUniqueStringTestCases()
 
-	callbacks := []isUniqueString{
-		isUniqueStringWithBitArray,
-		isUniqueStringWithBoolArray,
+	callbacks := []isUniqueBytes{
+		IsUniqueBytesWithBitArray,
+		IsUniqueBytesWithBoolArray,
 	}
 
 	for _, cb := range callbacks {
 		b.Run(utils.FunctionName(cb), func(b *testing.B) {
-			b.ReportAllocs()
-			b.ResetTimer()
-			for _, tc := range testCases {
-				_ = cb(tc.input)
+			for i := 0; i < b.N; i++ {
+				for _, tc := range testCases {
+					output := cb(tc.input)
+					if output != tc.output {
+						b.FailNow()
+					}
+				}
 			}
 		})
 	}
