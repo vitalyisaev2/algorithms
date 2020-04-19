@@ -17,36 +17,22 @@ type isPermutationTestCase struct {
 func makeIsPermutationTestCase() []isPermutationTestCase {
 	var rcv []isPermutationTestCase
 
-	// shuffled ASCII strings
-	{
-		s1 := utils.RandomASCIIString(256)
-		s2 := utils.ShuffleString(s1)
+	for _, size := range []int{1, 32, 1024, 32768} {
+		// shuffled ASCII strings
+		{
+			s1 := utils.RandomASCIIString(size)
+			s2 := utils.ShuffleString(s1)
 
-		rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: true})
-	}
+			rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: true})
+		}
 
-	// different ASCII strings
-	{
-		s1 := utils.RandomASCIIString(256)
-		s2 := utils.RandomASCIIString(256)
+		// different ASCII strings
+		{
+			s1 := utils.RandomASCIIString(size)
+			s2 := utils.RandomASCIIString(size)
 
-		rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: false})
-	}
-
-	// shuffled Cyrillic strings
-	{
-		s1 := utils.RandomUnicodeString(256, utils.CyrillicRussian)
-		s2 := utils.ShuffleString(s1)
-
-		rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: true})
-	}
-
-	// different Cyrillic strings
-	{
-		s1 := utils.RandomUnicodeString(256, utils.CyrillicRussian)
-		s2 := utils.RandomUnicodeString(256, utils.CyrillicRussian)
-
-		rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: false})
+			rcv = append(rcv, isPermutationTestCase{s1: s1, s2: s2, result: false})
+		}
 	}
 
 	return rcv
@@ -55,7 +41,8 @@ func makeIsPermutationTestCase() []isPermutationTestCase {
 func TestIsPermutation(t *testing.T) {
 	callbacks := []isPermutation{
 		IsPermutationWithSorting,
-		IsPermutationWithRuneCount,
+		IsPermutationWithMapRuneCount,
+		IsPermutationWithArrayRuneCount,
 	}
 
 	for _, cb := range callbacks {
@@ -72,7 +59,8 @@ func BenchmarkIsPermutation(b *testing.B) {
 
 	callbacks := []isPermutation{
 		IsPermutationWithSorting,
-		IsPermutationWithRuneCount,
+		IsPermutationWithMapRuneCount,
+		IsPermutationWithArrayRuneCount,
 	}
 
 	for _, cb := range callbacks {

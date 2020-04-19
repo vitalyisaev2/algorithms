@@ -30,12 +30,12 @@ func IsPermutationWithSorting(s1, s2 string) bool {
 	return true
 }
 
-func IsPermutationWithRuneCount(s1, s2 string) bool {
+func IsPermutationWithMapRuneCount(s1, s2 string) bool {
 	if len(s1) != len(s2) {
 		return false
 	}
 
-	// this makes them stay on heap
+	// this makes them stay on stack
 	runeCount1 := map[rune]int{}
 	runeCount2 := map[rune]int{}
 
@@ -49,6 +49,31 @@ func IsPermutationWithRuneCount(s1, s2 string) bool {
 
 	for r, count := range runeCount1 {
 		if runeCount2[r] != count {
+			return false
+		}
+	}
+
+	return true
+}
+
+func IsPermutationWithArrayRuneCount(s1, s2 string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	runeCount1 := [128]int{}
+	runeCount2 := [128]int{}
+
+	for _, r := range s1 {
+		runeCount1[r] += 1
+	}
+
+	for _, r := range s2 {
+		runeCount2[r] += 1
+	}
+
+	for ix, count := range runeCount1 {
+		if runeCount2[ix] != count {
 			return false
 		}
 	}
