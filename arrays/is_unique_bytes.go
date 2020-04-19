@@ -1,5 +1,9 @@
 package arrays
 
+import (
+	"sort"
+)
+
 type isUniqueBytes func([]byte) bool
 
 func IsUniqueBytesWithBoolArray(input []byte) bool {
@@ -36,6 +40,30 @@ func IsUniqueBytesWithBitArray(input []byte) bool {
 		}
 
 		bitset[bitsetItem] |= (1 << bitsetOffset)
+	}
+
+	return true
+}
+
+func IsUniqueBytesWithFullScan(input []byte) bool {
+	for i := 0; i < len(input); i++ {
+		for j := i + 1; j < len(input); j++ {
+			if input[i] == input[j] {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func IsUniqueBytesWithSorting(input []byte) bool {
+	sort.Slice(input, func(i, j int) bool { return input[i] < input[j] })
+
+	for i := 1; i < len(input); i++ {
+		if input[i-1] == input[i] {
+			return false
+		}
 	}
 
 	return true

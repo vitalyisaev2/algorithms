@@ -14,6 +14,13 @@ type isUniqueStringTestCase struct {
 	output bool
 }
 
+func (tc isUniqueStringTestCase) cloneInput() []byte {
+	clone := make([]byte, len(tc.input))
+	copy(clone, tc.input)
+
+	return clone
+}
+
 func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 	// конструирование наиболее длинной уникальной строки из возможных
 	buf := strings.Builder{}
@@ -58,12 +65,14 @@ func TestIsUniqueString(t *testing.T) {
 	callbacks := []isUniqueBytes{
 		IsUniqueBytesWithBitArray,
 		IsUniqueBytesWithBoolArray,
+		IsUniqueBytesWithFullScan,
+		IsUniqueBytesWithSorting,
 	}
 
 	for _, cb := range callbacks {
 		t.Run(utils.FunctionName(cb), func(t *testing.T) {
 			for _, tc := range testCases {
-				assert.Equal(t, tc.output, cb(tc.input))
+				assert.Equal(t, tc.output, cb(tc.cloneInput()), "input: '%v'", tc.input)
 			}
 		})
 	}
@@ -75,13 +84,24 @@ func BenchmarkIsUniqueString(b *testing.B) {
 	callbacks := []isUniqueBytes{
 		IsUniqueBytesWithBitArray,
 		IsUniqueBytesWithBoolArray,
+		IsUniqueBytesWithFullScan,
+		IsUniqueBytesWithSorting,
 	}
 
-	for _, cb := range callbacks {
+	for m, cb := range callbacks {
 		b.Run(utils.FunctionName(cb), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, tc := range testCases {
-					output := cb(tc.input)
+					input := tc.input
+
+					// функция IsUniqueBytesWithSorting изменяет входящий массив
+					if m == 3 {
+						b.StopTimer()
+						input = tc.cloneInput()
+						b.StartTimer()
+					}
+
+					output := cb(input)
 					if output != tc.output {
 						b.FailNow()
 					}
