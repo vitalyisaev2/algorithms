@@ -9,19 +9,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type isUniqueStringTestCase struct {
+type isUniqueBytesTestCase struct {
 	input  []byte
 	output bool
 }
 
-func (tc isUniqueStringTestCase) cloneInput() []byte {
+func (tc isUniqueBytesTestCase) cloneInput() []byte {
 	clone := make([]byte, len(tc.input))
 	copy(clone, tc.input)
 
 	return clone
 }
 
-func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
+func makeIsUniqueBytesTestCase() []isUniqueBytesTestCase {
 	// конструирование наиболее длинной уникальной строки из возможных
 	buf := strings.Builder{}
 
@@ -31,7 +31,7 @@ func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 
 	longestUniqueLine := buf.String()
 
-	return []isUniqueStringTestCase{
+	return []isUniqueBytesTestCase{
 		{
 			input:  []byte("a"),
 			output: true,
@@ -59,8 +59,8 @@ func makeIsUniqueStringTestCases() []isUniqueStringTestCase {
 	}
 }
 
-func TestIsUniqueString(t *testing.T) {
-	testCases := makeIsUniqueStringTestCases()
+func TestIsUniqueBytes(t *testing.T) {
+	testCases := makeIsUniqueBytesTestCase()
 
 	callbacks := []isUniqueBytes{
 		IsUniqueBytesWithBitArray,
@@ -79,7 +79,7 @@ func TestIsUniqueString(t *testing.T) {
 }
 
 func BenchmarkIsUniqueString(b *testing.B) {
-	testCases := makeIsUniqueStringTestCases()
+	testCases := makeIsUniqueBytesTestCase()
 
 	callbacks := []isUniqueBytes{
 		IsUniqueBytesWithBitArray,
