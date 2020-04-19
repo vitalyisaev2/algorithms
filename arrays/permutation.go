@@ -4,7 +4,7 @@ import (
 	"sort"
 )
 
-func isPermutation(string, string) bool
+type isPermutation func(string, string) bool
 
 func sortString(input string) string {
 	rcv := []rune(input)
@@ -30,23 +30,22 @@ func IsPermutationWithSorting(s1, s2 string) bool {
 	return true
 }
 
-func makeRuneFrequencyMap(input string) map[rune]int {
-	rcv := make(map[rune]int)
-
-	for _, r := range input {
-		rcv[r] += 1
-	}
-
-	return rcv
-}
-
 func IsPermutationWithRuneCount(s1, s2 string) bool {
 	if len(s1) != len(s2) {
 		return false
 	}
 
-	runeCount1 := makeRuneFrequencyMap(s1)
-	runeCount2 := makeRuneFrequencyMap(s2)
+	// this makes them stay on heap
+	runeCount1 := map[rune]int{}
+	runeCount2 := map[rune]int{}
+
+	for _, r := range s1 {
+		runeCount1[r] += 1
+	}
+
+	for _, r := range s2 {
+		runeCount2[r] += 1
+	}
 
 	for r, count := range runeCount1 {
 		if runeCount2[r] != count {
@@ -54,5 +53,5 @@ func IsPermutationWithRuneCount(s1, s2 string) bool {
 		}
 	}
 
-	return false
+	return true
 }
