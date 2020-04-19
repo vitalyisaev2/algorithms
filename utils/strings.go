@@ -54,3 +54,13 @@ func ShuffleString(input string) string {
 
 	return string(runes)
 }
+
+func ReverseString(input string) string {
+	output := make([]rune, len(input))
+
+	for i, r := range input {
+		output[len(input)-i-1] = r
+	}
+
+	return string(output)
+}

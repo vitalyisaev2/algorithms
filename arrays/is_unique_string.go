@@ -4,9 +4,11 @@ import (
 	"sort"
 )
 
-type isUniqueBytes func([]byte) bool
+type isUniqueString func(string) bool
 
-func IsUniqueBytesWithBoolArray(input []byte) bool {
+func IsUniqueStringWithBoolArray(_input string) bool {
+	input := []rune(_input)
+
 	if len(input) > 128 {
 		return false
 	}
@@ -24,16 +26,18 @@ func IsUniqueBytesWithBoolArray(input []byte) bool {
 	return true
 }
 
-func IsUniqueBytesWithBitArray(input []byte) bool {
+func IsUniqueStringWithBitArray(_input string) bool {
+	input := []rune(_input)
+
 	if len(input) > 128 {
 		return false
 	}
 
-	bitset := [2]int64{0, 0}
+	bitset := [2]int64{0, 0} // enough for 128-char alphabet
 
-	for _, char := range input {
-		bitsetItem := int(char) / 64
-		bitsetOffset := int(char) % 64
+	for _, r := range input {
+		bitsetItem := int(r) / 64
+		bitsetOffset := int(r) % 64
 
 		if (bitset[bitsetItem] & (1 << bitsetOffset)) > 0 {
 			return false
@@ -45,7 +49,8 @@ func IsUniqueBytesWithBitArray(input []byte) bool {
 	return true
 }
 
-func IsUniqueBytesWithFullScan(input []byte) bool {
+func IsUniqueStringWithFullScan(_input string) bool {
+	input := []rune(_input)
 	for i := 0; i < len(input); i++ {
 		for j := i + 1; j < len(input); j++ {
 			if input[i] == input[j] {
@@ -57,7 +62,9 @@ func IsUniqueBytesWithFullScan(input []byte) bool {
 	return true
 }
 
-func IsUniqueBytesWithSorting(input []byte) bool {
+func IsUniqueStringWithSorting(_input string) bool {
+	input := []rune(_input)
+
 	sort.Slice(input, func(i, j int) bool { return input[i] < input[j] })
 
 	for i := 1; i < len(input); i++ {
