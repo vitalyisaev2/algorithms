@@ -43,6 +43,7 @@ func TestIsPermutation(t *testing.T) {
 		IsPermutationWithSorting,
 		IsPermutationWithMapRuneCount,
 		IsPermutationWithArrayRuneCount,
+		IsPermutationWithArrayRuneCount2,
 	}
 
 	for _, cb := range callbacks {
@@ -61,6 +62,7 @@ func BenchmarkIsPermutation(b *testing.B) {
 		IsPermutationWithSorting,
 		IsPermutationWithMapRuneCount,
 		IsPermutationWithArrayRuneCount,
+		IsPermutationWithArrayRuneCount2,
 	}
 
 	for _, cb := range callbacks {

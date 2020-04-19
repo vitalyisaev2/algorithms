@@ -80,3 +80,24 @@ func IsPermutationWithArrayRuneCount(s1, s2 string) bool {
 
 	return true
 }
+
+func IsPermutationWithArrayRuneCount2(s1, s2 string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	runeCount := [128]int{}
+
+	for _, r := range s1 {
+		runeCount[r] += 1
+	}
+
+	for _, r := range s2 {
+		runeCount[r] -= 1
+		if runeCount[r] < 0 {
+			return false
+		}
+	}
+
+	return true
+}
