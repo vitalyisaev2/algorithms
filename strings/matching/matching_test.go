@@ -8,9 +8,12 @@ import (
 	"gitlab.com/vitalyisaev2/algorithms/utils"
 )
 
+type matcher func(pattern, text string) bool
+
 func TestMatching(t *testing.T) {
 	callbacks := []matcher{
 		bruteForce,
+		withAutomaton,
 	}
 
 	pattern := "GCAGAGAG"

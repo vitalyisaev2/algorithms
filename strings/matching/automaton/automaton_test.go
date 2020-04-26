@@ -72,27 +72,34 @@ func TestNewAutomaton(t *testing.T) {
 		}
 
 		assert.Equal(t, transitions, automaton.transitions)
+	})
 
-		t.Run("matching", func(t *testing.T) {
-			automaton := NewAutomaton("ACACAGA")
+	t.Run("matching", func(t *testing.T) {
+		testCases := []struct {
+			pattern string
+			text    string
+			result  bool
+		}{
+			{
+				pattern: "ACACAGA",
+				text:    "ACACAGAC",
+				result:  true,
+			},
+			{
+				pattern: "ACACAGA",
+				text:    "CRAB",
+				result:  false,
+			},
+			{
+				pattern: "GCAGAGAG",
+				text:    "GCATCGCAGAGAGTATACAGTACG",
+				result:  true,
+			},
+		}
 
-			testCases := []struct {
-				input  string
-				result bool
-			}{
-				{
-					input:  "ACACAGAC",
-					result: true,
-				},
-				{
-					input:  "CRAB",
-					result: false,
-				},
-			}
-
-			for _, tc := range testCases {
-				assert.Equal(t, tc.result, automaton.Match(tc.input))
-			}
-		})
+		for _, tc := range testCases {
+			automaton := NewAutomaton(tc.pattern)
+			assert.Equal(t, tc.result, automaton.Match(tc.text))
+		}
 	})
 }
