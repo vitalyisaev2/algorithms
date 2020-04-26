@@ -29,7 +29,7 @@ func (a *Automaton) Match(input string) bool {
 
 func (a *Automaton) Reset() { a.currentState = 0 }
 
-func longestPrefixLength(line string, r rune) int {
+func longestPrefixLength(line string, r rune) automatonState {
 	target := line + string(r)
 	i := len(line)
 
@@ -43,7 +43,7 @@ func longestPrefixLength(line string, r rune) int {
 		}
 	}
 
-	return i
+	return automatonState(i)
 }
 
 func NewAutomaton(pattern string) *Automaton {
@@ -59,10 +59,22 @@ func NewAutomaton(pattern string) *Automaton {
 	}
 
 	// set last state as successful
-	acceptStates := make([]bool, len(pattern))
+	acceptStates := make([]bool, len(pattern)+1)
 	acceptStates[i] = true
 
 	// take into account all alphabet characters and build additional edges
+	for i := 1; i < len(transitions)-1; i++ {
+		for r := range alphabet {
+			// omit existing state transitions
+			if _, exists := transitions[i][r]; exists {
+				continue
+			}
+
+			if length := longestPrefixLength(pattern[:i], r); length != 0 {
+				transitions[i][r] = length
+			}
+		}
+	}
 
 	return &Automaton{
 		currentState: 0,
