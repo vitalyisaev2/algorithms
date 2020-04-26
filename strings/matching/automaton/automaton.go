@@ -9,12 +9,16 @@ type Automaton struct {
 }
 
 func (a *Automaton) Match(input string) bool {
+	// reset state
+	a.currentState = 0
+
 	for _, r := range input {
 		possibleTransitions := a.transitions[a.currentState]
 
 		nextState, exists := possibleTransitions[r]
 		if !exists {
-			return false
+			a.currentState = 0
+			continue
 		}
 
 		if a.acceptStates[nextState] {
@@ -26,8 +30,6 @@ func (a *Automaton) Match(input string) bool {
 
 	return false
 }
-
-func (a *Automaton) Reset() { a.currentState = 0 }
 
 func longestPrefixLength(line string, r rune) automatonState {
 	target := line + string(r)
