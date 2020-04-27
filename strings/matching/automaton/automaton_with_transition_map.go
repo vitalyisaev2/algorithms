@@ -1,5 +1,9 @@
 package automaton
 
+import (
+	"unicode/utf8"
+)
+
 var _ Automaton = (*automatonWithTransitionMap)(nil)
 
 type automatonWithTransitionMap struct {
@@ -35,7 +39,7 @@ func NewAutomatonWithTransitionMap(pattern string) Automaton {
 	// build main state transitions line, also collect set of unique patten runes (ab)
 	i := automatonState(0)
 	alphabet := map[rune]struct{}{}
-	transitions := make([]map[rune]automatonState, len(pattern)+1)
+	transitions := make([]map[rune]automatonState, utf8.RuneCountInString(pattern)+1)
 
 	for _, r := range pattern {
 		transitions[i] = map[rune]automatonState{r: i + 1}

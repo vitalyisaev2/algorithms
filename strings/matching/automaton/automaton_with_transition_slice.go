@@ -2,6 +2,7 @@ package automaton
 
 import (
 	"sort"
+	"unicode/utf8"
 )
 
 var _ Automaton = (*automatonWithTransitionSlice)(nil)
@@ -71,7 +72,7 @@ func NewAutomatonWithTransitionSlice(pattern string) Automaton {
 
 	// construct transitions
 	i := automatonState(0)
-	transitions := make([][]automatonState, len(pattern)+1)
+	transitions := make([][]automatonState, utf8.RuneCountInString(pattern)+1)
 
 	for _, r := range pattern {
 		transitions[i] = make([]automatonState, len(ab))
