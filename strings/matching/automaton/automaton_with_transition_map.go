@@ -1,14 +1,14 @@
 package automaton
 
-type automatonState uint16
+var _ Automaton = (*automatonWithTransitionMap)(nil)
 
-type Automaton struct {
+type automatonWithTransitionMap struct {
 	currentState automatonState
 	acceptStates []bool
 	transitions  []map[rune]automatonState
 }
 
-func (a *Automaton) Match(input string) bool {
+func (a *automatonWithTransitionMap) Match(input string) bool {
 	// reset state
 	a.currentState = 0
 
@@ -31,25 +31,8 @@ func (a *Automaton) Match(input string) bool {
 	return false
 }
 
-func longestPrefixLength(line string, r rune) automatonState {
-	target := line + string(r)
-	i := len(line)
-
-	for ; i > 0; i-- {
-		prefix := line[:i]
-		j := len(target) - i
-		suffix := target[j:]
-
-		if prefix == suffix {
-			break
-		}
-	}
-
-	return automatonState(i)
-}
-
-func NewAutomaton(pattern string) *Automaton {
-	// build main state transitions line, also collect set of unique patten runes (alphabet)
+func NewAutomatonWithTransitionMap(pattern string) Automaton {
+	// build main state transitions line, also collect set of unique patten runes (ab)
 	i := automatonState(0)
 	alphabet := map[rune]struct{}{}
 	transitions := make([]map[rune]automatonState, len(pattern)+1)
@@ -64,7 +47,7 @@ func NewAutomaton(pattern string) *Automaton {
 	acceptStates := make([]bool, len(pattern)+1)
 	acceptStates[i] = true
 
-	// take into account all alphabet characters and build additional edges
+	// take into account all ab characters and build additional edges
 	for i := 1; i < len(transitions)-1; i++ {
 		for r := range alphabet {
 			// omit existing state transitions
@@ -78,7 +61,7 @@ func NewAutomaton(pattern string) *Automaton {
 		}
 	}
 
-	return &Automaton{
+	return &automatonWithTransitionMap{
 		currentState: 0,
 		acceptStates: acceptStates,
 		transitions:  transitions,

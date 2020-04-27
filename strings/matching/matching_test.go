@@ -2,6 +2,7 @@ package matching
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,17 +33,21 @@ func (tc *callbackMatcher) search() bool {
 }
 
 func (tc *callbackMatcher) String() string {
-	return utils.FunctionName(tc.matcher)
+	name := utils.FunctionName(tc.matcher)
+	parts := strings.Split(name, ".")
+
+	return parts[len(parts)-1]
 }
 
 type automatonMatcher struct {
-	text      string
-	automaton *automaton.Automaton
+	text        string
+	automaton   automaton.Automaton
+	constructor func(string) automaton.Automaton
 }
 
 func (tc *automatonMatcher) prepare(pattern, text string) {
 	tc.text = text
-	tc.automaton = automaton.NewAutomaton(pattern)
+	tc.automaton = tc.constructor(pattern)
 }
 
 func (tc *automatonMatcher) search() bool {
@@ -50,13 +55,15 @@ func (tc *automatonMatcher) search() bool {
 }
 
 func (tc *automatonMatcher) String() string {
-	return "automatonMatcher"
+	byPoints := strings.Split(utils.FunctionName(tc.constructor), ".")
+	return strings.Trim(byPoints[len(byPoints)-1], "New")
 }
 
 func makeMatchers() []matcher {
 	return []matcher{
 		&callbackMatcher{matcher: bruteForce},
-		&automatonMatcher{},
+		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionMap},
+		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionSlice},
 	}
 }
 
@@ -75,7 +82,7 @@ func makeMatchingTestCases() []matchingTestCase {
 		},
 		{
 			pattern: "ACACAGA",
-			text:    "ACACAGAC",
+			text:    "ACACACACACACACACACACACACAGAC",
 			result:  true,
 		},
 	}

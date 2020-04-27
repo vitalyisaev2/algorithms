@@ -1,7 +1,10 @@
 package automaton
 
 import (
+	"strings"
 	"testing"
+
+	"gitlab.com/vitalyisaev2/algorithms/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,8 +25,8 @@ func TestLongestPrefixLength(t *testing.T) {
 	})
 }
 
-func TestNewAutomaton(t *testing.T) {
-	automaton := NewAutomaton("ACACAGA")
+func TestAutomatonWithTransitionMap(t *testing.T) {
+	automaton := NewAutomatonWithTransitionMap("ACACAGA").(*automatonWithTransitionMap)
 
 	t.Run("current state", func(t *testing.T) {
 		assert.Equal(t, automatonState(0), automaton.currentState)
@@ -73,33 +76,48 @@ func TestNewAutomaton(t *testing.T) {
 
 		assert.Equal(t, transitions, automaton.transitions)
 	})
+}
 
-	t.Run("matching", func(t *testing.T) {
-		testCases := []struct {
-			pattern string
-			text    string
-			result  bool
-		}{
-			{
-				pattern: "ACACAGA",
-				text:    "ACACAGAC",
-				result:  true,
-			},
-			{
-				pattern: "ACACAGA",
-				text:    "CRAB",
-				result:  false,
-			},
-			{
-				pattern: "GCAGAGAG",
-				text:    "GCATCGCAGAGAGTATACAGTACG",
-				result:  true,
-			},
-		}
+type constructor func(string) Automaton
 
-		for _, tc := range testCases {
-			automaton := NewAutomaton(tc.pattern)
-			assert.Equal(t, tc.result, automaton.Match(tc.text))
-		}
-	})
+func makeConstructors() []constructor {
+	return []constructor{
+		NewAutomatonWithTransitionMap,
+		NewAutomatonWithTransitionSlice,
+	}
+}
+
+func TestAutomatonMatch(t *testing.T) {
+	for _, cn := range makeConstructors() {
+		functionName := strings.Trim(utils.FunctionName(cn), "New")
+
+		t.Run(functionName, func(t *testing.T) {
+			testCases := []struct {
+				pattern string
+				text    string
+				result  bool
+			}{
+				{
+					pattern: "ACACAGA",
+					text:    "ACACAGAC",
+					result:  true,
+				},
+				{
+					pattern: "ACACAGA",
+					text:    "CRAB",
+					result:  false,
+				},
+				{
+					pattern: "GCAGAGAG",
+					text:    "GCATCGCAGAGAGTATACAGTACG",
+					result:  true,
+				},
+			}
+
+			for _, tc := range testCases {
+				aut := cn(tc.pattern)
+				assert.Equal(t, tc.result, aut.Match(tc.text))
+			}
+		})
+	}
 }
