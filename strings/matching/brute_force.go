@@ -5,7 +5,7 @@ package matching
 func bruteForce(pattern, text string) bool {
 	limit := len(text) - len(pattern)
 
-	for start := 0; start < limit; start++ {
+	for start := 0; start <= limit; start++ {
 		i := 0
 
 		for {

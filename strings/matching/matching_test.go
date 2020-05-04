@@ -107,11 +107,11 @@ const largeText = `
 
 func makeMatchingTestCases() []matchingTestCase {
 	return []matchingTestCase{
-		//{
-		//	pattern: "ABCDE",
-		//	text:    "ABCDE",
-		//	result:  true,
-		//},
+		{
+			pattern: "ABCDE",
+			text:    "ABCDE",
+			result:  true,
+		},
 		{
 			pattern: "GCAGAGAG",
 			text:    "GCATCGCAGAGAGTATACAGTACG",
