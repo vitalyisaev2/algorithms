@@ -7,7 +7,7 @@ import (
 
 var _ Automaton = (*automatonWithTransitionSlice)(nil)
 
-// ab is a sorted slice of runes
+// alphabet is a sorted slice of runes
 type alphabet []rune
 
 func (ab alphabet) runePosition(r rune) (position int, exists bool) {
@@ -16,7 +16,7 @@ func (ab alphabet) runePosition(r rune) (position int, exists bool) {
 		func(i int) bool { return ab[i] >= r },
 	)
 
-	exists = position < len(ab)
+	exists = position < len(ab) && ab[position] == r
 
 	return
 }
@@ -34,7 +34,6 @@ func (a *automatonWithTransitionSlice) Match(input string) bool {
 
 	for _, r := range input {
 		runePositionInAlphabet, exists := a.ab.runePosition(r)
-
 		if !exists {
 			// no such rune in ab
 			a.currentState = 0

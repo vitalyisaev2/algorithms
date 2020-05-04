@@ -185,7 +185,7 @@ func BenchmarkMatching(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, tc := range testCases {
 
-					// don't take into account preparation phase, it's complex
+					// don't take into account preparation phase, it's too complex
 					b.StopTimer()
 					m.prepare(tc.pattern, tc.text)
 					b.StartTimer()
