@@ -1,23 +1,17 @@
 package matching
 
-import (
-	"gitlab.com/vitalyisaev2/algorithms/utils"
-)
-
 func hash(input []rune) int32 {
 	var sum int32 = 0
 
-	// TODO: byte shift for faster polynomial computation
 	for i, r := range input {
-		sum += int32(r) * utils.PowerInt32(2, int32(len(input)-1-i))
+		sum += int32(r) << int32(len(input)-1-i)
 	}
 
 	return sum
 }
 
 func rehash(first, last rune, size int, sumPrev int32) int32 {
-	pow := utils.PowerInt32(2, int32(size-1))
-	sumNext := 2*(sumPrev-int32(first)*pow) + int32(last)
+	sumNext := 2*(sumPrev-int32(first)<<int32(size-1)) + int32(last)
 
 	return sumNext
 }
