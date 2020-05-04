@@ -1,42 +1,46 @@
 package matching
 
 import (
-	"unicode/utf8"
-
 	"gitlab.com/vitalyisaev2/algorithms/utils"
 )
 
-func hash(input string) int32 {
-	var (
-		size       = utf8.RuneCountInString(input)
-		sum  int32 = 0
-	)
+func hash(input []rune) int32 {
+	var sum int32 = 0
 
 	// TODO: byte shift for faster polynomial computation
 	for i, r := range input {
-		sum += int32(r) * utils.PowerInt32(2, int32(size-1-i))
+		sum += int32(r) * utils.PowerInt32(2, int32(len(input)-1-i))
 	}
 
 	return sum
 }
 
-func rehash(first, last rune, size int, sum int32) int32 {
+func rehash(first, last rune, size int, sumPrev int32) int32 {
 	pow := utils.PowerInt32(2, int32(size-1))
-	return 2*(sum-int32(first)*pow) + int32(last)
+	sumNext := 2*(sumPrev-int32(first)*pow) + int32(last)
+
+	return sumNext
 }
 
-func karpRabin(pattern, text string) bool {
+func karpRabin(_pattern, _text string) bool {
+	pattern := []rune(_pattern)
+	text := []rune(_text)
+
 	patternHash := hash(pattern)
 	textHash := hash(text[:len(pattern)])
 
-	patternSize := utf8.RuneCountInString(pattern)
-	textSize := utf8.RuneCountInString(text)
+	// strings of equal size
+	if len(text) == len(pattern) {
+		return textHash == patternHash
+	}
+
+	edge := len(text) - len(pattern)
 
 OUTER:
-	for j := 0; j <= textSize-patternSize; j++ {
+	for j := 0; j < edge; j++ {
 		// hashes matched, need to compare char by char
 		if patternHash == textHash {
-			for i := 0; i < patternSize; i++ {
+			for i := 0; i < len(pattern); i++ {
 				// it was a collision
 				if pattern[i] != text[j+i] {
 					continue OUTER
@@ -45,7 +49,7 @@ OUTER:
 			return true
 		}
 
-		textHash = rehash(rune(text[j]), rune(text[j+patternSize]), patternSize, textHash)
+		textHash = rehash(text[j], text[j+len(pattern)], len(pattern), textHash)
 	}
 
 	return false

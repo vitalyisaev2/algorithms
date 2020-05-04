@@ -61,9 +61,9 @@ func (tc *automatonMatcher) String() string {
 
 func makeMatchers() []matcher {
 	return []matcher{
-		&callbackMatcher{matcher: bruteForce},
-		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionMap},
-		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionSlice},
+		//&callbackMatcher{matcher: bruteForce},
+		//&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionMap},
+		//&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionSlice},
 		&callbackMatcher{matcher: karpRabin},
 	}
 }
@@ -74,7 +74,7 @@ type matchingTestCase struct {
 	result  bool
 }
 
-const largeText = `
+const largeUnicodeText = `
 Владимир Щировский
 
 Вчера я умер и меня
@@ -107,9 +107,10 @@ const largeText = `
 
 func makeMatchingTestCases() []matchingTestCase {
 	return []matchingTestCase{
+		// Positive
 		{
-			pattern: "ABCDE",
-			text:    "ABCDE",
+			pattern: "ABC",
+			text:    "ABC",
 			result:  true,
 		},
 		{
@@ -122,11 +123,42 @@ func makeMatchingTestCases() []matchingTestCase {
 			text:    "ACACACACACACACACACACACACACACACACACACACACAGAC",
 			result:  true,
 		},
-		//{
-		//	pattern: "заметил",
-		//	text:    largeText,
-		//	result:  true,
-		//},
+		{
+			pattern: "ГДЕ",
+			text:    "АБВГДЕ",
+			result:  true,
+		},
+		{
+			pattern: "заметил",
+			text:    largeUnicodeText,
+			result:  true,
+		},
+		// Negative
+		{
+			pattern: "ABC",
+			text:    "ABD",
+			result:  false,
+		},
+		{
+			pattern: "ABC",
+			text:    "ABDE",
+			result:  false,
+		},
+		{
+			pattern: "АБВ",
+			text:    "АБГ",
+			result:  false,
+		},
+		{
+			pattern: "АБВ",
+			text:    "АБГЕ",
+			result:  false,
+		},
+		{
+			pattern: "ACACACACACACACACACACAGB",
+			text:    "ACACACACACACACACACACACACACACACACACACACACAGAC",
+			result:  false,
+		},
 	}
 }
 
@@ -134,14 +166,14 @@ func TestMatching(t *testing.T) {
 	testCases := makeMatchingTestCases()
 
 	for _, m := range makeMatchers() {
-		for i, tc := range testCases {
-			t.Run(m.String(), func(t *testing.T) {
+		t.Run(m.String(), func(t *testing.T) {
+			for i, tc := range testCases {
 				t.Run(fmt.Sprint(i), func(t *testing.T) {
 					m.prepare(tc.pattern, tc.text)
 					assert.Equal(t, tc.result, m.search())
 				})
-			})
-		}
+			}
+		})
 	}
 }
 
@@ -150,16 +182,19 @@ func BenchmarkMatching(b *testing.B) {
 
 	for _, m := range makeMatchers() {
 		b.Run(m.String(), func(b *testing.B) {
-			for i, tc := range testCases {
-				b.Run(fmt.Sprint(i), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, tc := range testCases {
+
+					// don't take into account preparation phase, it's complex
+					b.StopTimer()
 					m.prepare(tc.pattern, tc.text)
-					for i := 0; i < b.N; i++ {
-						result := m.search()
-						if result != tc.result {
-							b.FailNow()
-						}
+					b.StartTimer()
+
+					result := m.search()
+					if result != tc.result {
+						b.FailNow()
 					}
-				})
+				}
 			}
 		})
 	}
