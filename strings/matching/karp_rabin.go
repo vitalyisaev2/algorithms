@@ -37,7 +37,7 @@ func karpRabin(_pattern, _text string) bool {
 	edge := len(text) - len(pattern)
 
 OUTER:
-	for j := 0; j < edge; j++ {
+	for j := 0; j <= edge; j++ {
 		// hashes matched, need to compare char by char
 		if patternHash == textHash {
 			for i := 0; i < len(pattern); i++ {
@@ -47,6 +47,10 @@ OUTER:
 				}
 			}
 			return true
+		}
+
+		if j+len(pattern) == len(text) {
+			break OUTER
 		}
 
 		textHash = rehash(text[j], text[j+len(pattern)], len(pattern), textHash)

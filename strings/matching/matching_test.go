@@ -61,9 +61,9 @@ func (tc *automatonMatcher) String() string {
 
 func makeMatchers() []matcher {
 	return []matcher{
-		//&callbackMatcher{matcher: bruteForce},
-		//&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionMap},
-		//&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionSlice},
+		&callbackMatcher{matcher: bruteForce},
+		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionMap},
+		&automatonMatcher{constructor: automaton.NewAutomatonWithTransitionSlice},
 		&callbackMatcher{matcher: karpRabin},
 	}
 }
